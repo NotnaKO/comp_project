@@ -1,10 +1,11 @@
 use rstest::rstest;
 
-use compl::{approximating_with_substitute, solve_with_dyn_by_costs, solve_with_dyn_by_weights};
+use compl::{approximating_with_substitute, naive_solution, solve_with_dyn_by_costs, solve_with_dyn_by_weights};
 
 #[rstest]
 #[case(solve_with_dyn_by_weights)]
 #[case(solve_with_dyn_by_costs)]
+#[case(naive_solution)]
 #[case(approximating_with_substitute(0.001))]
 #[case(approximating_with_substitute(0.01))]
 #[case(approximating_with_substitute(0.1))]
@@ -21,6 +22,7 @@ fn it_works_1(#[case] func: impl Fn(Vec<(usize, usize)>, usize) -> usize) {
 #[rstest]
 #[case(solve_with_dyn_by_weights)]
 #[case(solve_with_dyn_by_costs)]
+#[case(naive_solution)]
 #[case(approximating_with_substitute(0.001))]
 #[case(approximating_with_substitute(0.01))]
 #[case(approximating_with_substitute(0.1))]
@@ -32,6 +34,7 @@ fn is_works_2(#[case] func: impl Fn(Vec<(usize, usize)>, usize) -> usize) {
 #[rstest]
 #[case(solve_with_dyn_by_weights)]
 #[case(solve_with_dyn_by_costs)]
+#[case(naive_solution)]
 #[case(approximating_with_substitute(0.001))]
 #[case(approximating_with_substitute(0.01))]
 #[case(approximating_with_substitute(0.1))]
@@ -43,6 +46,7 @@ fn is_works_3(#[case] func: impl Fn(Vec<(usize, usize)>, usize) -> usize) {
 #[rstest]
 #[case(solve_with_dyn_by_weights)]
 #[case(solve_with_dyn_by_costs)]
+#[case(naive_solution)]
 #[case(approximating_with_substitute(0.001))]
 #[case(approximating_with_substitute(0.01))]
 #[case(approximating_with_substitute(0.1))]
@@ -55,6 +59,7 @@ fn empty_data(#[case] func: impl Fn(Vec<(usize, usize)>, usize) -> usize) {
 #[rstest]
 #[case(solve_with_dyn_by_weights)]
 #[case(solve_with_dyn_by_costs)]
+#[case(naive_solution)]
 #[case(approximating_with_substitute(0.001))]
 #[case(approximating_with_substitute(0.01))]
 #[case(approximating_with_substitute(0.1))]
@@ -62,4 +67,17 @@ fn empty_data(#[case] func: impl Fn(Vec<(usize, usize)>, usize) -> usize) {
 fn zero_capacity(#[case] func: impl Fn(Vec<(usize, usize)>, usize) -> usize) {
     let data = vec![(1, 1000)];
     assert_eq!(func(data, 0), 0);
+}
+
+#[rstest]
+#[case(solve_with_dyn_by_weights)]
+#[case(solve_with_dyn_by_costs)]
+#[case(naive_solution)]
+#[case(approximating_with_substitute(0.001))]
+#[case(approximating_with_substitute(0.01))]
+fn all_need(#[case] func: impl Fn(Vec<(usize, usize)>, usize) -> usize) {
+    let data = vec![(1, 1); 20];
+    assert_eq!(func(data.clone(), 21), 20);
+    assert_eq!(func(data.clone(), 20), 20);
+    assert_eq!(func(data.clone(), 19), 19);
 }

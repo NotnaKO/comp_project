@@ -1,3 +1,25 @@
+use itertools::Itertools;
+
+pub fn naive_solution(objects: Vec<(usize, usize)>, cap: usize) -> usize {
+    objects
+        .into_iter()
+        .powerset()
+        .filter_map(|s| {
+            let t = s
+                .iter()
+                .copied()
+                .reduce(|(w_1, c_1), (w_2, c_2)| (w_1 + w_2, c_1 + c_2))
+                .unwrap_or_default();
+            if t.0 <= cap {
+                Some(t.1)
+            } else {
+                None
+            }
+        })
+        .max()
+        .unwrap_or_default()
+}
+
 pub fn solve_with_dyn_by_weights(objects: Vec<(usize, usize)>, knapsack_capacity: usize) -> usize {
     let mut old_layer = vec![0; knapsack_capacity + 1];
     for (cur_weight, cur_cost) in objects.into_iter() {
@@ -64,13 +86,13 @@ pub fn approximating_solution(
     }
 
     let delta =
-        epsilon * objects.iter().map(|(_, c)| *c).max().unwrap() as f64 / objects.len() as f64;
+        epsilon * 0.9 * objects.iter().map(|(_, c)| *c).max().unwrap() as f64 / objects.len() as f64;
     let transformed_objects = objects
         .into_iter()
         .map(|(w, c)| (w, (c as f64 / delta).floor() as usize))
         .collect();
     let answer_after_transform = solve_with_dyn_by_costs(transformed_objects, knapsack_capacity);
-    (answer_after_transform as f64 * delta).floor() as usize
+    (answer_after_transform as f64 * delta).round() as usize
 }
 
 pub fn approximating_with_substitute(epsilon: f64) -> impl Fn(Vec<(usize, usize)>, usize) -> usize {
